@@ -1,37 +1,59 @@
 /**
- * User preferences endpoints.
+ * User preferences — GET/PUT for persisting user settings.
+ * Stores key-value pairs in D1 user_preferences table.
  */
 import { Hono } from 'hono';
 import type { Env, Variables } from '../../src/types.js';
 
-const preferenceRoutes = new Hono<{ Bindings: Env; Variables: Variables }>();
+const prefs = new Hono<{ Bindings: Env; Variables: Variables }>();
 
-preferenceRoutes.get('/', async (c) => {
+// GET /v1/preferences — return all user preferences
+prefs.get('/', async (c) => {
   const userId = c.get('userId');
-  const result = await c.env.DB.prepare('SELECT key, value, updated_at FROM user_preferences WHERE user_id = ? ORDER BY key')
-    .bind(userId).all<{ key: string; value: string; updated_at: string }>();
-  const prefs: Record<string, string> = {};
-  for (const row of result.results ?? []) prefs[row.key] = row.value;
-  return c.json({ preferences: prefs });
+  const { results } = await c.env.DB.prepare(
+    'SELECT key, value, updated_at FROM user_preferences WHERE user_id = ?',
+  ).bind(userId).all<{ key: string; value: string; updated_at: string }>();
+
+  // Convert to simple key-value object, parsing JSON values
+  const out: Record<string, string | boolean | number> = {};
+  for (const row of results) {
+    try {
+      out[row.key] = JSON.parse(row.value);
+    } catch {
+      out[row.key] = row.value;
+    }
+  }
+  return c.json(out);
 });
 
-preferenceRoutes.put('/:key', async (c) => {
+// PUT /v1/preferences — update one or more preferences
+prefs.put('/', async (c) => {
   const userId = c.get('userId');
-  const key = c.req.param('key');
-  const body = (await c.req.json<{ value: string }>().catch(() => ({ value: '' as string }))) as { value: string };
-  if (typeof body.value !== 'string') return c.json({ error: { type: 'validation_error', code: 'missing_field', message: 'value (string) is required' } }, 422);
-  const now = new Date().toISOString();
-  await c.env.DB.prepare(
-    `INSERT INTO user_preferences (user_id, key, value, updated_at) VALUES (?, ?, ?, ?) ON CONFLICT(user_id, key) DO UPDATE SET value = ?, updated_at = ?`
-  ).bind(userId, key, body.value, now, body.value, now).run();
-  return c.json({ key, value: body.value, updated_at: now });
+  const body = await c.req.json<Record<string, unknown>>().catch(() => ({}));
+  if (!body || typeof body !== 'object') {
+    return c.json({ error: { message: 'JSON object with key-value pairs required' } }, 400);
+  }
+
+  const allowedKeys = new Set([
+    'streaming', 'pii', 'theme', 'model', 'maxTokens', 'temperature', 'systemPrompt',
+  ]);
+
+  const entries = Object.entries(body).filter(([k]) => allowedKeys.has(k));
+  if (entries.length === 0) {
+    return c.json({ error: { message: 'No valid preference keys. Allowed: streaming, pii, theme, model, maxTokens, temperature, systemPrompt' } }, 400);
+  }
+
+  // Upsert each preference
+  const stmts = entries.map(([key, value]) =>
+    c.env.DB.prepare(
+      `INSERT INTO user_preferences (user_id, key, value, updated_at)
+       VALUES (?, ?, ?, datetime('now'))
+       ON CONFLICT(user_id, key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
+    ).bind(userId, key, JSON.stringify(value)),
+  );
+
+  await c.env.DB.batch(stmts);
+  return c.json({ updated: Object.fromEntries(entries) });
 });
 
-preferenceRoutes.delete('/:key', async (c) => {
-  const userId = c.get('userId');
-  const key = c.req.param('key');
-  await c.env.DB.prepare('DELETE FROM user_preferences WHERE user_id = ? AND key = ?').bind(userId, key).run();
-  return c.json({ deleted: key });
-});
-
-export default preferenceRoutes;
+export default prefs;

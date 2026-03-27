@@ -1,6 +1,35 @@
 import { html, useState, useEffect } from '../preact-shim.js';
 import { settingsOpen, theme, addToast } from '../app.js';
 
+// Save preferences to backend
+async function savePrefs(obj) {
+  try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+    await fetch('/v1/preferences', {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(obj),
+    });
+  } catch { /* silent */ }
+}
+
+// Load preferences from backend
+async function loadPrefs(setPrivacy, setStream) {
+  try {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+    const res = await fetch('/v1/preferences', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (typeof data.pii === 'boolean') setPrivacy(data.pii);
+    if (typeof data.streaming === 'boolean') setStream(data.streaming);
+    if (data.theme === 'dark' || data.theme === 'light') theme.value = data.theme;
+  } catch { /* silent */ }
+}
+
 export function Settings() {
   const [tab, setTab] = useState('providers');
   const [providers, setProviders] = useState([
@@ -8,6 +37,15 @@ export function Settings() {
   ]);
   const [privacyMode, setPrivacyMode] = useState(true);
   const [streaming, setStreaming] = useState(true);
+  const [loaded, setLoaded] = useState(false);
+
+  // Load from backend on first open
+  useEffect(() => {
+    if (!loaded) {
+      setLoaded(true);
+      loadPrefs(setPrivacyMode, setStreaming);
+    }
+  }, [settingsOpen.value]);
 
   const tabs = [
     { id: 'providers', label: '🤖 Models', icon: '🤖' },
@@ -58,14 +96,14 @@ export function Settings() {
                 <div>Stream responses</div>
                 <div class="toggle-desc">See the narration appear word by word</div>
               </div>
-              <button class="toggle ${streaming ? 'on' : ''}" onclick=${() => setStreaming(!streaming)}></button>
+              <button class="toggle ${streaming ? 'on' : ''}" onclick=${() => { const v = !streaming; setStreaming(v); savePrefs({ streaming: v }); }}></button>
             </div>
             <div class="toggle-row">
               <div>
                 <div>PII protection</div>
                 <div class="toggle-desc">Encrypt personal info in your messages</div>
               </div>
-              <button class="toggle ${privacyMode ? 'on' : ''}" onclick=${() => setPrivacyMode(!privacyMode)}></button>
+              <button class="toggle ${privacyMode ? 'on' : ''}" onclick=${() => { const v = !privacyMode; setPrivacyMode(v); savePrefs({ pii: v }); }}></button>
             </div>
           </div>
           <div class="settings-section">
@@ -76,7 +114,7 @@ export function Settings() {
                 <div class="toggle-desc">${theme.value === 'dark' ? 'Currently active' : 'Currently off'}</div>
               </div>
               <button class="toggle ${theme.value === 'dark' ? 'on' : ''}"
-                onclick=${() => theme.value = theme.value === 'dark' ? 'light' : 'dark'}></button>
+                onclick=${() => { const v = theme.value === 'dark' ? 'light' : 'dark'; theme.value = v; savePrefs({ theme: v }); }}></button>
             </div>
           </div>
           <div class="settings-section">
@@ -91,12 +129,13 @@ export function Settings() {
         `}
         ${tab === 'about' && html`
           <div class="settings-section">
-            <h3>LOG</h3>
+            <h3>DMlog.ai</h3>
             <p class="settings-desc">
-              Your AI remembers everything. Every conversation, every preference, every insight — stored securely and used to improve future responses.
+              Your AI Dungeon Master remembers everything. Every NPC, every plot thread, every epic moment — stored securely and used to make each session better.
             </p>
             <div class="about-links">
-              <a href="https://github.com/CedarBeach2019/log-origin" target="_blank" rel="noopener">📖 Source Code</a>
+              <a href="https://github.com/CedarBeach2019/dmlog-ai" target="_blank" rel="noopener">📖 Source Code</a>
+              <a href="https://github.com/CedarBeach2019/log-origin" target="_blank" rel="noopener">🔧 Core Engine (log-origin)</a>
             </div>
           </div>
           <div class="settings-section">
