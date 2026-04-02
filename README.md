@@ -1,14 +1,14 @@
-# ActiveLog.ai
+# ACTIVELOG-AI
 
-> Privacy-first AI fitness companion. Built on log-origin. Cloudflare-native, forkable, yours.
+> Fitness & Activity AI Tracker — part of the [Cocapn](https://cocapn.ai) ecosystem
 
-## What Is This
+![Build](https://img.shields.io/badge/build-passing-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-24_files-blue) ![Lines](https://img.shields.io/badge/lines-4717-green)
 
-ActiveLog.ai is a themed fitness vessel built on [log-origin](https://github.com/CedarBeach2019/log-origin) — an AI fitness coach that tracks workouts, nutrition, recovery, and progress with a smart training planner.
+## Description
 
-**The core idea:** Every workout builds a log. The log trains the coach. The coach gets better. Your fitness has a memory.
+Fitness & Activity AI Tracker. Part of the Cocapn ecosystem of AI-powered log and analysis tools.
 
-## Features
+## ✨ Features
 
 - **Workout Logger** — Log strength, cardio, HIIT, flexibility, and sports sessions with exercises, sets, reps, weight, and RPE
 - **Nutrition Tracker** — Track meals, macros (protein/carbs/fat), calories, and water intake with daily summaries
@@ -20,88 +20,65 @@ ActiveLog.ai is a themed fitness vessel built on [log-origin](https://github.com
 - **Streak Tracker** — Current and longest workout streaks, weekly goal progress
 - **Deload Detection** — Fatigue analysis from recovery data, training streak, and RPE trends
 
-## Architecture
+## 🚀 Quick Start
 
-```
-src/fitness/
-  tracker.ts    — WorkoutLog, NutritionLog, RecoveryTracker, ProgressiveOverload, StreakTracker
-  planner.ts    — WorkoutPlanner, Periodization, DeloadDetector
-worker/routes/
-  fitness.ts    — /api/workouts, /api/nutrition, /api/recovery, /api/progress
-public/
-  app.html      — Dark athletic UI (charcoal #1F2937, electric green #10B981)
+```bash
+git clone https://github.com/Lucineer/activelog-ai.git
+cd activelog-ai
+npm install
+npx wrangler dev
 ```
 
-## Status
+## 🤖 Claude Code Integration
 
-🚧 **Active Development** — Fitness vessel on log-origin. Architecture docs in `docs/`.
+Optimized for Claude Code with full agent support:
 
-## Design Documents
+- **CLAUDE.md** — Complete project context, conventions, and architecture
+- **.claude/agents/** — Specialized sub-agents for exploration, architecture, and review
+- **.claude/settings.json** — Permissions and plugin configuration
 
-| Document | What It Covers |
-|----------|---------------|
-| [Platform Vision](docs/PLATFORM-VISION.md) | The big picture: LOG.ai concept, domains as hubs, omni-bot, flywheel |
-| [Master Plan](docs/MASTER-PLAN.md) | 7-phase roadmap, architecture overview, privacy model |
-| [Database Schema](docs/database/SCHEMA-DESIGN.md) | Every table, column, index, migration strategy, D1 constraints |
-| [Intelligence Design](docs/routing/INTELLIGENCE-DESIGN.md) | Routing, classification, adaptive learning, draft rounds, agent routing |
-| [Security Model](docs/security/SECURITY-MODEL.md) | 17-threat matrix, auth, authorization, API security, Worker security |
-| [Privacy Architecture](docs/privacy/PRIVACY-ARCHITECTURE.md) | Encryption flows, PII detection, zero-knowledge analysis, compliance |
-| [API Design](docs/api/API-DESIGN.md) | Every endpoint, request/response schemas, streaming, error handling |
-| [Protocol Spec](docs/api/PROTOCOL-SPEC.md) | MCP integration, agent communication, local tunnels, federation |
-| [UX Design](docs/ux/UX-DESIGN.md) | Personas, wireframes, theming, accessibility, information architecture |
-| [Component Spec](docs/ux/COMPONENT-SPEC.md) | Preact components, state management, streaming, performance |
-| [Initial Design](docs/architecture/initial-design.md) | Original design from the research phase |
+## 🏗️ Architecture
 
-## Design Documents
+| Component | File | Description |
+|-----------|------|-------------|
+| Worker | `src/worker.ts` | Cloudflare Worker with inline HTML |
+| BYOK | `src/lib/byok.ts` | 7 LLM providers, encrypted keys |
+| Health | `/health` | Health check endpoint |
+| Setup | `/setup` | BYOK configuration wizard |
+| Chat | `/api/chat` | LLM chat endpoint |
+| Assets | `/public/*` | KV-served images |
 
-| Document | What It Covers |
-|----------|---------------|
-| [Platform Vision](docs/PLATFORM-VISION.md) | The big picture: LOG.ai concept, domains as hubs, omni-bot, flywheel |
-| [Master Plan](docs/MASTER-PLAN.md) | 7-phase roadmap, architecture overview, privacy model |
-| [Database Schema](docs/database/SCHEMA-DESIGN.md) | Every table, column, index, migration strategy, D1 constraints |
-| [Intelligence Design](docs/routing/INTELLIGENCE-DESIGN.md) | Routing, classification, adaptive learning, draft rounds, agent routing |
-| [Security Model](docs/security/SECURITY-MODEL.md) | 17-threat matrix, auth, authorization, API security, Worker security |
-| [Privacy Architecture](docs/privacy/PRIVACY-ARCHITECTURE.md) | Encryption flows, PII detection, zero-knowledge analysis, compliance |
-| [API Design](docs/api/API-DESIGN.md) | Every endpoint, request/response schemas, streaming, error handling |
-| [Protocol Spec](docs/api/PROTOCOL-SPEC.md) | MCP integration, agent communication, local tunnels, federation |
-| [UX Design](docs/ux/UX-DESIGN.md) | Personas, wireframes, theming, accessibility, information architecture |
-| [Component Spec](docs/ux/COMPONENT-SPEC.md) | Preact components, state management, streaming, performance |
-| [Initial Design](docs/architecture/initial-design.md) | Original design from the research phase |
+**Zero runtime dependencies.** Pure TypeScript on Cloudflare Workers.
 
-## Key Design Decisions
+## 🔑 BYOK (Bring Your Own Key)
 
-- **Cloudflare Workers** — edge deployment, $0 on free tier, scale to zero
-- **D1 (SQLite)** — our current Python prototype uses SQLite, D1 ports directly
-- **Preact** — 4KB, no build step, ships as static Worker assets
-- **Hono** — typed HTTP framework for Workers
-- **Client-side encryption** — AES-256-GCM, PBKDF2 key derivation, zero-knowledge at rest
-- **Regex-first routing** — 5ms classification on Workers, ML optimizes rules over time
-- **OpenAI-compatible API** — drop-in replacement for existing SDKs
+Supports 7 LLM providers — no vendor lock-in:
 
-## Themed Forks
+- OpenAI (GPT-4, GPT-4o)
+- Anthropic (Claude 3.5, Claude 4)
+- Google (Gemini Pro, Gemini Flash)
+- DeepSeek (Chat, Reasoner)
+- Groq (Llama, Mixtral)
+- Mistral (Large, Medium)
+- OpenRouter (100+ models)
 
-log-origin is the engine. Themed forks add personality:
+Configuration discovery: URL params → Auth header → Cookie → KV → fail.
 
-- **ActiveLog.ai** — AI fitness companion with workout tracking, nutrition, and recovery (this vessel)
-- **DMlog.ai** — TTRPG world-builder's AI
-- **studylog.ai** — AI tutor that remembers what you've learned
-- **makerlog.ai** — AI pair programmer that learns your style
-- **businesslog.ai** — AI assistant for operations and analytics
+## 📦 Deployment
 
-Each fork customizes: system prompts, UI theme, routing rules, and feature set.
+```bash
+npx wrangler deploy
+```
 
-## Research
+Requires `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` environment variables.
 
-See `.research/` for the raw research that informed the design:
+## 🔗 Links
 
-- `cloudflare-arch.md` — Cloudflare services, limits, pricing
-- `privacy-vault.md` — Encryption research, threat model
-- `agent-tunnels.md` — Cloudflare Tunnel, MCP, A2A protocols
-- `forkable-repo.md` — Fork patterns, update mechanism, personality packs
-- `log-platform.md` — LOG.ai brand concept, omni-bot design
-- `multi-tenant.md` — Workers for Platforms, scaling tiers
-- `agent-network.md` — Agent identity, discovery, communication
+- 🌐 **Live**: https://activelog-ai.magnus-digennaro.workers.dev
+- ❤️ **Health**: https://activelog-ai.magnus-digennaro.workers.dev/health
+- ⚙️ **Setup**: https://activelog-ai.magnus-digennaro.workers.dev/setup
+- 🧠 **Cocapn**: https://cocapn.ai
 
 ## License
 
-MIT
+MIT — Built with ❤️ by [Superinstance](https://github.com/superinstance) & [Lucineer](https://github.com/Lucineer) (DiGennaro et al.)
