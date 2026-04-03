@@ -150,11 +150,6 @@ export default {
 
     if (url.pathname === '/') return new Response(landingHTML(), { headers });
     if (url.pathname === '/api/efficiency') return new Response(JSON.stringify({ totalCached: 0, totalHits: 0, cacheHitRate: 0, tokensSaved: 0, repo: 'activelog-ai', timestamp: Date.now() }), { headers: { ...cors, 'Content-Type': 'application/json' } });
-      try {
-      } catch (e) {
-        return new Response(JSON.stringify({ totalCached: 0, totalHits: 0, cacheHitRate: 0, tokensSaved: 0, repo: 'activelog-ai', timestamp: Date.now(), error: 'efficiency tracking not initialized' }), { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
-      }
-    }
     if (url.pathname === '/setup') return new Response(generateSetupHTML(NAME, BRAND), { headers });
 
     if (url.pathname === '/api/seed') {
