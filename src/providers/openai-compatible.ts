@@ -1,4 +1,4 @@
-import type { Env, ProviderMessage, ProviderResponse } from '../types';
+import type { Env, ProviderMessage, ProviderResponse } from '../types.js';
 
 // ─── Options ───────────────────────────────────────────────────────────────
 

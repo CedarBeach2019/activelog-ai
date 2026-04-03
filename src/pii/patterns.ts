@@ -1,4 +1,4 @@
-import type { PIIType } from '../types';
+import type { PIIType } from '../types.js';
 
 export interface PIIPattern {
   type: PIIType;

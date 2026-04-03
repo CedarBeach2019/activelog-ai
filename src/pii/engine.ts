@@ -1,4 +1,4 @@
-import type { PIIType, PIIMatch, DehydrationResult } from '../types';
+import type { PIIType, PIIMatch, DehydrationResult } from '../types.js';
 import { PII_PATTERNS, ENTITY_PREFIX, luhnCheck } from './patterns';
 
 // ─── Entity ID generation ──────────────────────────────────────────────────

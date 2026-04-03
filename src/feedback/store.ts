@@ -1,4 +1,4 @@
-import type { FeedbackRating } from '../types';
+import type { FeedbackRating } from '../types.js';
 
 // ─── Constants ─────────────────────────────────────────────────────────────
 

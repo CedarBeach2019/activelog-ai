@@ -56,6 +56,9 @@ export default {
     const headers = { 'Content-Type': 'text/html;charset=utf-8', 'Content-Security-Policy': CSP };
     const jsonHeaders = { 'Content-Type': 'application/json' };
 
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type,Authorization' } });
+    }
     if (url.pathname === '/') return new Response(landingHTML(), { headers });
     if (url.pathname === '/health') return new Response(JSON.stringify({ status: 'ok', service: NAME, fleet: FLEET }), { headers: jsonHeaders });
     if (url.pathname === '/setup') return new Response(generateSetupHTML(NAME, BRAND), { headers });

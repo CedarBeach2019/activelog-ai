@@ -1,4 +1,4 @@
-import type { RoutingAction, Classification } from '../types';
+import type { RoutingAction, Classification } from '../types.js';
 
 // ─── Static rule definition ────────────────────────────────────────────────
 
