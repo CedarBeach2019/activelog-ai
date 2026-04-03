@@ -149,6 +149,7 @@ export default {
     }
 
     if (url.pathname === '/') return new Response(landingHTML(), { headers });
+    if (url.pathname === '/api/efficiency') return new Response(JSON.stringify({ totalCached: 0, totalHits: 0, cacheHitRate: 0, tokensSaved: 0, repo: 'activelog-ai', timestamp: Date.now() }), { headers: { ...cors, 'Content-Type': 'application/json' } });
     if (url.pathname === '/health') return new Response(JSON.stringify({ status: 'ok', service: NAME, fleet: FLEET }), { headers: jsonHeaders });
     if (url.pathname === '/setup') return new Response(generateSetupHTML(NAME, BRAND), { headers });
 
