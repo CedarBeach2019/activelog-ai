@@ -1,7 +1,8 @@
 name = "activelog-ai"
+account_id = "049ff5e84ecf636b53b162cbb580aae6"
 main = "src/worker.ts"
 compatibility_date = "2024-12-01"
 
 [[kv_namespaces]]
 binding = "ACTIVELOG_KV"
-id = "ca9975272263468a9f49a008d9aaa132"
+id = "fd028413c2f049698518f32c63ec598e"

@@ -84,7 +84,9 @@ function landingHTML(): string {
 .footer{text-align:center;padding:2rem;color:#333;font-size:.75rem;border-top:1px solid #1a1a1a}
 </style></head><body>
 <div class="hero">
-  <h1>${NAME}</h1>
+  
+      <img src="https://cocapn-logos.casey-digennaro.workers.dev/img/cocapn-logo-v1.png" alt="Cocapn" style="width:64px;height:auto;margin-bottom:.5rem;border-radius:8px;display:block;margin-left:auto;margin-right:auto">
+      <h1>${NAME}</h1>
   <p>${TAGLINE}</p>
   <div class="badge">💪 AI Training Coach · BYOK · Fleet Protocol</div>
 </div>
